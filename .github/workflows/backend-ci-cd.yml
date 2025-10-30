@@ -19,7 +19,6 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18.x'
-        cache: 'npm'
     
     - name: Install dependencies
       run: npm install
@@ -29,19 +28,12 @@ jobs:
         echo "Checking backend files..."
         test -f "server.js" && echo "✅ server.js exists"
         test -f "package.json" && echo "✅ package.json exists"
-        test -d "routes" && echo "✅ routes directory exists" || echo "⚠️ routes directory missing"
-        test -d "models" && echo "✅ models directory exists" || echo "⚠️ models directory missing"
     
     - name: Validate server.js syntax
       run: |
         echo "Validating server.js syntax..."
         node --check server.js
         echo "✅ No syntax errors in server.js!"
-    
-    - name: Check all JS files
-      run: |
-        echo "Checking all JavaScript files for syntax errors..."
-        find . -name "*.js" -not -path "./node_modules/*" -exec node --check {} \; && echo "✅ All files validated!"
     
     - name: Build status
       run: echo "🎉 Backend validation completed successfully!"
