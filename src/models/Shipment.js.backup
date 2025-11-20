@@ -141,6 +141,7 @@ shipmentSchema.pre('save', async function(next) {
 });
 
 // Index for tracking
+shipmentSchema.index({ trackingNumber: 1 });
 shipmentSchema.index({ customer: 1, status: 1 });
 
 module.exports = mongoose.model('Shipment', shipmentSchema);

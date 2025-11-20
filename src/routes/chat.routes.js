@@ -1,13 +1,29 @@
 const express = require('express');
 const router = express.Router();
+const chatController = require('../controllers/chatController');
 const { protect } = require('../middleware/auth.middleware');
+const { uploadChatAttachment } = require('../middleware/upload.middleware');
 
+// Protect all routes
 router.use(protect);
 
-router.get('/conversations', (req, res) => res.json({ message: 'Get user conversations' }));
-router.get('/conversations/:id/messages', (req, res) => res.json({ message: 'Get conversation messages' }));
-router.post('/conversations', (req, res) => res.json({ message: 'Create conversation' }));
-router.post('/messages', (req, res) => res.json({ message: 'Send message' }));
-router.put('/messages/:id/read', (req, res) => res.json({ message: 'Mark message as read' }));
+// Send message with optional attachment
+router.post(
+  '/messages',
+  uploadChatAttachment,  // Use the new chat upload middleware
+  chatController.sendMessage
+);
+
+// Get messages for a conversation
+router.get('/messages/:conversationId', chatController.getMessages);
+
+// Get user conversations
+router.get('/conversations', chatController.getConversations);
+
+// Create/Get conversation
+router.post('/conversations', chatController.createConversation);
+
+// Delete message
+router.delete('/messages/:messageId', chatController.deleteMessage);
 
 module.exports = router;

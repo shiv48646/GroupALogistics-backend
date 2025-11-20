@@ -1,5 +1,5 @@
 const Customer = require('../models/Customer');
-const { sendResponse, sendError, sendPaginatedResponse } = require('../utils/responseHandler');
+const { successResponse: sendResponse, errorResponse: sendError, paginatedResponse: sendPaginatedResponse } = require('../utils/responseHandler');
 
 // @desc    Get all customers
 // @route   GET /api/v1/customers

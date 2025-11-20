@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 
 const chatSchema = new mongoose.Schema({
-  conversation: {
+  conversationId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Conversation',
-    required: true
+    required: true,
+    index: true
   },
   sender: {
     type: mongoose.Schema.Types.ObjectId,
@@ -13,86 +14,39 @@ const chatSchema = new mongoose.Schema({
   },
   message: {
     type: String,
-    required: true
+    trim: true
   },
-  type: {
-    type: String,
-    enum: ['text', 'image', 'file', 'location', 'system'],
-    default: 'text'
-  },
-  attachments: [{
-    name: String,
+  attachment: {
     url: String,
+    publicId: String,
     type: String,
+    name: String,
     size: Number
-  }],
-  read: {
+  },
+  isRead: {
     type: Boolean,
     default: false
-  },
-  readAt: {
-    type: Date
   },
   readBy: [{
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     },
-    readAt: Date
+    readAt: {
+      type: Date,
+      default: Date.now
+    }
   }],
-  deleted: {
-    type: Boolean,
-    default: false
-  },
-  deletedAt: {
-    type: Date
+  timestamp: {
+    type: Date,
+    default: Date.now,
+    index: true
   }
 }, {
   timestamps: true
 });
 
-// Index for efficient queries
-chatSchema.index({ conversation: 1, createdAt: -1 });
-chatSchema.index({ sender: 1 });
+// Index for faster queries
+chatSchema.index({ conversationId: 1, timestamp: -1 });
 
-const conversationSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    trim: true
-  },
-  type: {
-    type: String,
-    enum: ['direct', 'group'],
-    default: 'direct'
-  },
-  participants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  }],
-  admin: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  lastMessage: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Chat'
-  },
-  avatar: {
-    type: String
-  },
-  isActive: {
-    type: Boolean,
-    default: true
-  }
-}, {
-  timestamps: true
-});
-
-// Index
-conversationSchema.index({ participants: 1 });
-
-const Chat = mongoose.model('Chat', chatSchema);
-const Conversation = mongoose.model('Conversation', conversationSchema);
-
-module.exports = { Chat, Conversation };
+module.exports = mongoose.model('Chat', chatSchema);

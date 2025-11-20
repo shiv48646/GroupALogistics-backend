@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const customerSchema = new mongoose.Schema({
   customerId: {
-    type: String,
-    unique: true,
-    required: true
-  },
+  type: String,
+  unique: true,
+  required: false  // Changed from true to false
+},
   name: {
     type: String,
     required: [true, 'Customer name is required'],

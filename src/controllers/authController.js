@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { sendResponse, sendError } = require('../utils/responseHandler');
+const { successResponse: sendResponse, errorResponse: sendError } = require('../utils/responseHandler');
 const crypto = require('crypto');
 
 // @desc    Register new user
