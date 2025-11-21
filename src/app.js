@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -79,51 +79,6 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/settings', settingsRoutes);
 
-// Temporary debug route - REMOVE IN PRODUCTION
-app.get('/api/debug/users', async (req, res) => {
-  try {
-    const User = require('./models/User');
-    const users = await User.find({}, 'email name role isActive').lean();
-    res.json({ 
-      success: true, 
-      count: users.length,
-      users: users.map(u => ({
-        email: u.email,
-        name: u.name,
-        role: u.role,
-        isActive: u.isActive
-      }))
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-
-// Temporary password reset - REMOVE IN PRODUCTION
-app.post('/api/debug/reset-password', async (req, res) => {
-  try {
-    const User = require('./models/User');
-    const user = await User.findOne({ email: req.body.email });
-    
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-    
-    user.password = req.body.newPassword;
-    await user.save();
-    
-    const token = user.generateAuthToken();
-    
-    res.json({ 
-      success: true, 
-      message: 'Password reset successfully',
-      token 
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
 
 // 404 Handler
 app.use((req, res) => {
