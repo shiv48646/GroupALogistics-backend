@@ -24,6 +24,9 @@ const profileRoutes = require('./routes/profile.routes');
 const settingsRoutes = require('./routes/settings.routes');
 
 // Initialize Express app
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const { apiLimiter, authLimiter } = require('./middleware/security.middleware');
 const app = express();
 
 // Security Middleware
@@ -48,6 +51,14 @@ app.use(cors({
 // Body Parser Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Security Middleware
+app.use(mongoSanitize()); // Prevent NoSQL injection
+app.use(xss()); // Prevent XSS attacks
+
+// Rate limiting
+app.use('/api/', apiLimiter); // Apply to all API routes
+app.use('/api/auth/login', authLimiter); // Stricter limit for login
+app.use('/api/auth/register', authLimiter); // Stricter limit for register
 
 // Logging Middleware
 if (config.NODE_ENV === 'development') {
