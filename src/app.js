@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -22,6 +22,11 @@ const notificationsRoutes = require('./routes/notifications.routes');
 const analyticsRoutes = require('./routes/analytics.routes');
 const profileRoutes = require('./routes/profile.routes');
 const settingsRoutes = require('./routes/settings.routes');
+// Import new expense management routes
+const categoriesRoutes = require('./routes/categories.routes');
+const expensesRoutes = require('./routes/expenses.routes');
+const budgetsRoutes = require('./routes/budgets.routes');
+const tripsRoutes = require('./routes/trips.routes');
 
 // Initialize Express app
 // const mongoSanitize = require('express-mongo-sanitize');
@@ -88,7 +93,13 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/profile', profileRoutes);
-app.use('/api/settings', settingsRoutes);
+app.use('/api/settings', settingsRoutes); = @"
+
+// Register new expense management routes
+app.use('/api/categories', categoriesRoutes);
+app.use('/api/expenses', expensesRoutes);
+app.use('/api/budgets', budgetsRoutes);
+app.use('/api/trips', tripsRoutes);
 
 
 // 404 Handler
@@ -103,4 +114,5 @@ app.use((req, res) => {
 app.use(errorMiddleware);
 
 module.exports = app;
+
 

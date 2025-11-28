@@ -1,0 +1,258 @@
+// src/routes/trips.routes.js
+const express = require('express');
+const router = express.Router();
+const { protect } = require('../middleware/auth.middleware');
+const Trip = require('../models/Trip');
+
+// Middleware to protect all routes
+router.use(protect);
+
+// @route   GET /api/trips
+// @desc    Get all trips
+// @access  Private
+router.get('/', async (req, res, next) => {
+  try {
+    const { truck, driver, status, startDate, endDate } = req.query;
+    const filter = { createdBy: req.user._id };
+
+    if (truck) filter.truck = truck;
+    if (driver) filter.driver = driver;
+    if (status) filter.status = status;
+
+    if (startDate || endDate) {
+      filter.startDate = {};
+      if (startDate) filter.startDate.$gte = new Date(startDate);
+      if (endDate) filter.startDate.$lte = new Date(endDate);
+    }
+
+    const trips = await Trip.find(filter)
+      .populate('truck', 'registrationNumber model')
+      .populate('driver', 'name email phone')
+      .populate('expenses', 'title amount date')
+      .sort({ startDate: -1 });
+
+    res.json({
+      success: true,
+      data: trips,
+      count: trips.length,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   GET /api/trips/:id
+// @desc    Get single trip
+// @access  Private
+router.get('/:id', async (req, res, next) => {
+  try {
+    const trip = await Trip.findOne({
+      _id: req.params.id,
+      createdBy: req.user._id,
+    })
+      .populate('truck')
+      .populate('driver')
+      .populate({
+        path: 'expenses',
+        populate: { path: 'category', select: 'name type color' },
+      });
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: 'Trip not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: trip,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   POST /api/trips
+// @desc    Create new trip
+// @access  Private
+router.post('/', async (req, res, next) => {
+  try {
+    const {
+      truck,
+      driver,
+      origin,
+      destination,
+      startDate,
+      endDate,
+      distance,
+      cargo,
+      revenue,
+      notes,
+    } = req.body;
+
+    const trip = await Trip.create({
+      truck,
+      driver,
+      origin,
+      destination,
+      startDate,
+      endDate,
+      distance,
+      cargo,
+      revenue,
+      notes,
+      createdBy: req.user._id,
+    });
+
+    await trip.populate([
+      { path: 'truck', select: 'registrationNumber model' },
+      { path: 'driver', select: 'name email' },
+    ]);
+
+    res.status(201).json({
+      success: true,
+      message: 'Trip created successfully',
+      data: trip,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   PUT /api/trips/:id
+// @desc    Update trip
+// @access  Private
+router.put('/:id', async (req, res, next) => {
+  try {
+    const trip = await Trip.findOne({
+      _id: req.params.id,
+      createdBy: req.user._id,
+    });
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: 'Trip not found',
+      });
+    }
+
+    const allowedUpdates = [
+      'truck',
+      'driver',
+      'origin',
+      'destination',
+      'startDate',
+      'endDate',
+      'distance',
+      'status',
+      'cargo',
+      'revenue',
+      'notes',
+    ];
+
+    allowedUpdates.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        trip[field] = req.body[field];
+      }
+    });
+
+    await trip.save();
+    await trip.populate([
+      { path: 'truck', select: 'registrationNumber model' },
+      { path: 'driver', select: 'name email' },
+    ]);
+
+    res.json({
+      success: true,
+      message: 'Trip updated successfully',
+      data: trip,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   DELETE /api/trips/:id
+// @desc    Delete trip
+// @access  Private
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const trip = await Trip.findOne({
+      _id: req.params.id,
+      createdBy: req.user._id,
+    });
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: 'Trip not found',
+      });
+    }
+
+    // Delete associated expenses if needed
+    if (trip.expenses.length > 0) {
+      const Expense = require('../models/Expense');
+      await Expense.updateMany(
+        { _id: { $in: trip.expenses } },
+        { $unset: { trip: '' } }
+      );
+    }
+
+    await trip.deleteOne();
+
+    res.json({
+      success: true,
+      message: 'Trip deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   PATCH /api/trips/:id/status
+// @desc    Update trip status
+// @access  Private
+router.patch('/:id/status', async (req, res, next) => {
+  try {
+    const { status } = req.body;
+
+    if (!status || !['scheduled', 'in_progress', 'completed', 'cancelled'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status',
+      });
+    }
+
+    const trip = await Trip.findOne({
+      _id: req.params.id,
+      createdBy: req.user._id,
+    });
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: 'Trip not found',
+      });
+    }
+
+    trip.status = status;
+
+    // Auto-set endDate if completing trip
+    if (status === 'completed' && !trip.endDate) {
+      trip.endDate = new Date();
+    }
+
+    await trip.save();
+
+    res.json({
+      success: true,
+      message: 'Trip status updated successfully',
+      data: trip,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+module.exports = router;
