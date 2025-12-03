@@ -34,9 +34,6 @@ const tripsRoutes = require('./routes/trips.routes');
 const { apiLimiter, authLimiter } = require('./middleware/security.middleware');
 const app = express();
 
-// Enable trust proxy for Render/production deployment
-app.set('trust proxy', 1);
-
 // Security Middleware
 app.use(helmet());
 
@@ -117,6 +114,5 @@ app.use((req, res) => {
 app.use(errorMiddleware);
 
 module.exports = app;
-
 
 
