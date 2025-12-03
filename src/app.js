@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -27,6 +27,7 @@ const categoriesRoutes = require('./routes/categories.routes');
 const expensesRoutes = require('./routes/expenses.routes');
 const budgetsRoutes = require('./routes/budgets.routes');
 const tripsRoutes = require('./routes/trips.routes');
+const driversRoutes = require('./routes/drivers.routes');
 
 // Initialize Express app
 // const mongoSanitize = require('express-mongo-sanitize');
@@ -103,6 +104,7 @@ app.use('/api/categories', categoriesRoutes);
 app.use('/api/expenses', expensesRoutes);
 app.use('/api/budgets', budgetsRoutes);
 app.use('/api/trips', tripsRoutes);
+app.use('/api/drivers', driversRoutes);
 
 
 // 404 Handler
@@ -117,6 +119,7 @@ app.use((req, res) => {
 app.use(errorMiddleware);
 
 module.exports = app;
+
 
 
 

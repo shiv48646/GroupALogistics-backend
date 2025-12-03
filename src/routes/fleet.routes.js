@@ -1,25 +1,29 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth.middleware');
+const {
+  getVehicles,
+  getVehicle,
+  createVehicle,
+  updateVehicle,
+  deleteVehicle,
+  getFleetOverview,
+  addMaintenanceRecord,
+} = require('../controllers/fleetController');
 
-// Import controller (you'll need to create fleetController.js)
-// const { getVehicles, getVehicle, createVehicle, updateVehicle, deleteVehicle } = require('../controllers/fleetController');
-
-// All routes require authentication
 router.use(protect);
 
-// Placeholder routes - implement controllers as needed
+router.get('/stats/overview', getFleetOverview);
+
 router.route('/')
-  .get((req, res) => res.json({ message: 'Get all vehicles' }))
-  .post(authorize('admin', 'manager'), (req, res) => res.json({ message: 'Create vehicle' }));
+  .get(getVehicles)
+  .post(authorize('admin', 'manager'), createVehicle);
 
 router.route('/:id')
-  .get((req, res) => res.json({ message: `Get vehicle ${req.params.id}` }))
-  .put(authorize('admin', 'manager'), (req, res) => res.json({ message: `Update vehicle ${req.params.id}` }))
-  .delete(authorize('admin'), (req, res) => res.json({ message: `Delete vehicle ${req.params.id}` }));
+  .get(getVehicle)
+  .put(authorize('admin', 'manager'), updateVehicle)
+  .delete(authorize('admin'), deleteVehicle);
 
-router.get('/overview', (req, res) => {
-  res.json({ message: 'Fleet overview statistics' });
-});
+router.post('/:id/maintenance', authorize('admin', 'manager'), addMaintenanceRecord);
 
 module.exports = router;
