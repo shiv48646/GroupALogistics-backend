@@ -93,7 +93,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/profile', profileRoutes);
-app.use('/api/settings', settingsRoutes); = @"
+app.use('/api/settings', settingsRoutes);
 
 // Register new expense management routes
 app.use('/api/categories', categoriesRoutes);
