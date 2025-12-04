@@ -8,7 +8,7 @@ const tripSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    truck: {
+    vehicle: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Vehicle',
       required: [true, 'Truck is required'],
@@ -87,9 +87,10 @@ tripSchema.pre('save', async function (next) {
 
 // Indexes
 tripSchema.index({ tripNumber: 1 });
-tripSchema.index({ truck: 1 });
+tripSchema.index({ vehicle: 1 });
 tripSchema.index({ driver: 1 });
 tripSchema.index({ status: 1 });
 tripSchema.index({ startDate: -1 });
 
 module.exports = mongoose.model('Trip', tripSchema);
+

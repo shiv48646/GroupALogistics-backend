@@ -43,7 +43,7 @@ const expenseSchema = new mongoose.Schema({
   },
   truck: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Truck',
+    ref: 'Vehicle',
     default: null
   },
   driver: {
@@ -169,3 +169,4 @@ expenseSchema.statics.getExpensesByCategory = async function(filter = {}) {
 const Expense = mongoose.model('Expense', expenseSchema);
 
 module.exports = Expense;
+
