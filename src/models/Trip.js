@@ -95,3 +95,4 @@ tripSchema.index({ startDate: -1 });
 module.exports = mongoose.model('Trip', tripSchema);
 
 
+
