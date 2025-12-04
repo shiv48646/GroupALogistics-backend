@@ -48,7 +48,7 @@ const expenseSchema = new mongoose.Schema({
   },
   driver: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Driver',
+    ref: 'User',
     default: null
   },
   tags: [{
@@ -169,4 +169,5 @@ expenseSchema.statics.getExpensesByCategory = async function(filter = {}) {
 const Expense = mongoose.model('Expense', expenseSchema);
 
 module.exports = Expense;
+
 
