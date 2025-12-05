@@ -1,11 +1,11 @@
-// src/models/Trip.js
+﻿// src/models/Trip.js
 const mongoose = require('mongoose');
 
 const tripSchema = new mongoose.Schema(
   {
     tripNumber: {
       type: String,
-      required: true,
+      required: false,
       unique: true,
     },
     vehicle: {
@@ -93,6 +93,7 @@ tripSchema.index({ status: 1 });
 tripSchema.index({ startDate: -1 });
 
 module.exports = mongoose.model('Trip', tripSchema);
+
 
 
 
