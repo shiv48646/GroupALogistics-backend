@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -34,6 +34,9 @@ const driversRoutes = require('./routes/drivers.routes');
 // const xss = require('xss-clean');
 const { apiLimiter, authLimiter } = require('./middleware/security.middleware');
 const app = express();
+
+// Trust proxy for Render deployment
+app.set('trust proxy', 1);
 
 // Enable trust proxy for Render/production deployment
 app.set('trust proxy', 1);
@@ -119,6 +122,7 @@ app.use((req, res) => {
 app.use(errorMiddleware);
 
 module.exports = app;
+
 
 
 
