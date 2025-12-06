@@ -1,4 +1,4 @@
-// src/models/Trip.js
+﻿// src/models/Trip.js
 const mongoose = require('mongoose');
 
 const tripSchema = new mongoose.Schema(
@@ -11,7 +11,7 @@ const tripSchema = new mongoose.Schema(
     vehicle: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Vehicle',
-      required: [true, 'Truck is required'],
+      required: [true, 'Vehicle is required'],
     },
     driver: {
       type: mongoose.Schema.Types.ObjectId,
@@ -93,6 +93,7 @@ tripSchema.index({ status: 1 });
 tripSchema.index({ startDate: -1 });
 
 module.exports = mongoose.model('Trip', tripSchema);
+
 
 
 

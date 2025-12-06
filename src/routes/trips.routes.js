@@ -1,4 +1,4 @@
-// src/routes/trips.routes.js
+﻿// src/routes/trips.routes.js
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth.middleware');
@@ -12,10 +12,10 @@ router.use(protect);
 // @access  Private
 router.get('/', async (req, res, next) => {
   try {
-    const { truck, driver, status, startDate, endDate } = req.query;
+    const { vehicle, driver, status, startDate, endDate } = req.query;
     const filter = { createdBy: req.user._id };
 
-    if (truck) filter.truck = truck;
+    if (vehicle) filter.vehicle = truck;
     if (driver) filter.driver = driver;
     if (status) filter.status = status;
 
@@ -26,7 +26,7 @@ router.get('/', async (req, res, next) => {
     }
 
     const trips = await Trip.find(filter)
-      .populate('truck', 'registrationNumber model')
+      .populate('vehicle', 'registrationNumber model')
       .populate('driver', 'name email phone')
       .populate('expenses', 'title amount date')
       .sort({ startDate: -1 });
@@ -50,7 +50,7 @@ router.get('/:id', async (req, res, next) => {
       _id: req.params.id,
       createdBy: req.user._id,
     })
-      .populate('truck')
+      .populate('vehicle')
       .populate('driver')
       .populate({
         path: 'expenses',
