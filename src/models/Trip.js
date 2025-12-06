@@ -1,4 +1,4 @@
-﻿// src/models/Trip.js
+// src/models/Trip.js
 const mongoose = require('mongoose');
 
 const tripSchema = new mongoose.Schema(
@@ -93,6 +93,7 @@ tripSchema.index({ status: 1 });
 tripSchema.index({ startDate: -1 });
 
 module.exports = mongoose.model('Trip', tripSchema);
+
 
 
 
