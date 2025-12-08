@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -30,42 +30,45 @@ const tripsRoutes = require('./routes/trips.routes');
 const driversRoutes = require('./routes/drivers.routes');
 
 // Initialize Express app
-// const mongoSanitize = require('express-mongo-sanitize');
-// const xss = require('xss-clean');
 const { apiLimiter, authLimiter } = require('./middleware/security.middleware');
 const app = express();
 
 // Trust proxy for Render deployment
 app.set('trust proxy', 1);
 
-// Enable trust proxy for Render/production deployment
-app.set('trust proxy', 1);
-
 // Security Middleware
 app.use(helmet());
 
-// CORS Configuration
-app.use(cors({
+// ✅ FIXED: CORS Configuration with proper headers
+const corsOptions = {
   origin: function(origin, callback) {
-    const allowedOrigins = config.FRONTEND_URL.split(',');
+    const allowedOrigins = config.FRONTEND_URL ? config.FRONTEND_URL.split(',') : [];
     // Allow requests with no origin (like mobile apps or Postman)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (allowedOrigins.length === 0 || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      // For development, allow all origins
+      // For development/testing, allow all origins
       callback(null, true);
     }
   },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400, // 24 hours
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+
+// ✅ Handle preflight requests explicitly
+app.options('*', cors(corsOptions));
+
 // Body Parser Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-// Security Middleware
-// app.use(mongoSanitize()); // Prevent NoSQL injection
-// app.use(xss()); // Prevent XSS attacks
 
 // Rate limiting
 app.use('/api/', apiLimiter); // Apply to all API routes
@@ -83,6 +86,7 @@ app.get('/health', (req, res) => {
     success: true,
     message: 'Server is running',
     timestamp: new Date().toISOString(),
+    environment: config.NODE_ENV,
   });
 });
 
@@ -102,13 +106,12 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/settings', settingsRoutes);
 
-// Register new expense management routes
+// Register expense management routes
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/expenses', expensesRoutes);
 app.use('/api/budgets', budgetsRoutes);
 app.use('/api/trips', tripsRoutes);
 app.use('/api/drivers', driversRoutes);
-
 
 // 404 Handler
 app.use((req, res) => {
@@ -122,8 +125,3 @@ app.use((req, res) => {
 app.use(errorMiddleware);
 
 module.exports = app;
-
-
-
-
-
