@@ -32,12 +32,16 @@ const io = new Server(server, {
 
 socketHandler(io);
 
+// 🔧 FIX: Bind to 0.0.0.0 for Render deployment
+const PORT = config.PORT || process.env.PORT || 5000;
+const HOST = config.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+
 // Start server
-server.listen(config.PORT, () => {
+server.listen(PORT, HOST, () => {
   console.log('=================================');
   console.log(`🚀 Server running in ${config.NODE_ENV} mode`);
-  console.log(`📡 Server: http://localhost:${config.PORT}`);
-  console.log(`🏥 Health: http://localhost:${config.PORT}/health`);
+  console.log(`📡 Server: http://${HOST}:${PORT}`);
+  console.log(`🏥 Health: http://${HOST}:${PORT}/health`);
   console.log('=================================');
 });
 
