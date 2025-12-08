@@ -7,6 +7,7 @@ const tripSchema = new mongoose.Schema(
       type: String,
       required: false,
       unique: true,
+      // ✅ REMOVED: index: true (not needed, 'unique' already creates index)
     },
     vehicle: {
       type: mongoose.Schema.Types.ObjectId,
@@ -86,16 +87,10 @@ tripSchema.pre('save', async function (next) {
 });
 
 // Indexes
-tripSchema.index({ tripNumber: 1 });
+// ✅ REMOVED: tripSchema.index({ tripNumber: 1 }); (duplicate - 'unique: true' already creates this)
 tripSchema.index({ vehicle: 1 });
 tripSchema.index({ driver: 1 });
 tripSchema.index({ status: 1 });
 tripSchema.index({ startDate: -1 });
 
 module.exports = mongoose.model('Trip', tripSchema);
-
-
-
-
-
-
